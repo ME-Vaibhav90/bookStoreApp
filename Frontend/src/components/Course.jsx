@@ -1,10 +1,38 @@
-import React from 'react'
-import list from '../list.json';
+
+import axios from 'axios';
 import Cards from './Cards.jsx';
 import {Link} from "react-router-dom";
+import { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useAuth } from '../context/AuthProvider.jsx';  
 
 
 function Course() {
+
+
+    const { authUser } = useAuth();
+
+if (authUser === undefined) return <div>Loading...</div>;
+if (!authUser) return <Navigate to="/signup" />;
+
+
+    const [book,setBook]=useState([])
+    useEffect(()=>{
+       const getBook = async () => {
+        try {
+          const res = await axios.get("http://localhost:4001/book");
+          console.log(res.data);
+          setBook(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+       };
+  getBook();
+    },[]);
+        
+
+
+
     return (
         <>
             <div className="max-w-screen-xl container mx-auto md:px-3 px-2">
@@ -27,7 +55,7 @@ function Course() {
                 </Link>    
                     <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5 " >
                         {
-                            list.map((item)=>(
+                            book.map((item)=>(
                                 <Cards key={item.id} item={item} />
                             ))
                         }
